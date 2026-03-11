@@ -1,21 +1,15 @@
-//
-//  SendToClawApp.swift
-//  SendToClaw
-//
-//  Created by Hwang on 3/11/26.
-//
-
 import SwiftUI
-import CoreData
 
 @main
 struct SendToClawApp: App {
-    let persistenceController = PersistenceController.shared
+    @StateObject private var appState = AppState()
 
     var body: some Scene {
-        WindowGroup {
-            ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+        MenuBarExtra("SendToClaw", systemImage: "mic.circle") {
+            MenuBarView(appState: appState)
+                .onAppear {
+                    appState.setup()
+                }
         }
     }
 }

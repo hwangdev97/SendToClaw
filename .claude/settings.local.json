@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /Users/hwang/Develop/macOS/SendToClaw -type f | grep -E \"\\\\.\\(swift|plist|json|yml|yaml|md|xcconfig\\)$\" | sort)",
+      "Bash(tree -L 3 /Users/hwang/Develop/macOS/SendToClaw -I \".git\" 2>/dev/null || find /Users/hwang/Develop/macOS/SendToClaw -not -path \"*/.git/*\" -type d | sort)",
+      "Bash(find /Users/hwang/Develop -maxdepth 2 -type f \\\\\\( -name \"*.md\" -o -name \"*.txt\" -o -name \"*.json\" \\\\\\) 2>/dev/null | grep -v node_modules)",
+      "Bash(grep -r \"openclaw\\\\|OpenClaw\" /Users/hwang/Develop --include=\"*.json\" --include=\"*.md\" --include=\"*.swift\" --include=\"*.ts\" --include=\"*.js\" 2>/dev/null | head -20)",
+      "Bash(grep -r \"gateway\\\\|port.*18789\" /Users/hwang/Develop --include=\"*.json\" --include=\"*.md\" 2>/dev/null | head -10)",
+      "Bash(git -C /Users/hwang/Develop/macOS/SendToClaw log --oneline --all 2>/dev/null | head -20)",
+      "Bash(git -C /Users/hwang/Develop/macOS/SendToClaw show HEAD --stat 2>/dev/null)",
+      "Bash(openclaw --version 2>/dev/null || echo \"OpenClaw not in PATH or error\")",
+      "Bash(openclaw gateway:*)",
+      "Bash(which openclaw:*)",
+      "Bash(find /Users/hwang/.openclaw -type f \\\\\\( -name \"*API*\" -o -name \"*api*\" -o -name \"*README*\" -o -name \"*SPEC*\" -o -name \"*spec*\" \\\\\\) 2>/dev/null | head -20)",
+      "Bash(curl -s http://localhost:18789/ 2>&1 | head -20)",
+      "Bash(npm list:*)",
+      "Bash(grep -r \"agent.run\\\\|chat.send\\\\|message.send\" /Users/hwang/.nvm/versions/node/v24.12.0/lib/node_modules/openclaw/docs/ --include=\"*.md\" 2>/dev/null | head -30)",
+      "Bash(find /Users/hwang/.nvm/versions/node/v24.12.0/lib/node_modules/openclaw -name \"*.md\" -exec grep -l \"agent.run\\\\|chat\\\\.send\" {} \\\\; 2>/dev/null | head -10)",
+      "Bash(cd /Users/hwang/Develop/macOS/SendToClaw/SendToClaw/SendToClaw && mkdir -p Models Services Views && rm -f Persistence.swift && rm -rf SendToClaw.xcdatamodeld)",
+      "Bash(cd /Users/hwang/Develop/macOS/SendToClaw/SendToClaw && xcodebuild -project SendToClaw.xcodeproj -scheme SendToClaw -configuration Debug build 2>&1 | tail -60)",
+      "Bash(xcodebuild -project SendToClaw.xcodeproj -scheme SendToClaw -configuration Debug build 2>&1 | tail -30)",
+      "Bash(xcodebuild -project SendToClaw.xcodeproj -scheme SendToClaw -configuration Debug build 2>&1 | grep -E \"\\(error:|BUILD\\)\" | tail -20)",
+      "Bash(xcodebuild test:*)",
+      "Bash(xcodebuild -project SendToClaw.xcodeproj -scheme SendToClaw -configuration Debug build 2>&1 | grep -E \"\\(error:|warning:|BUILD\\)\" | tail -20)",
+      "Bash(xcodebuild -project SendToClaw.xcodeproj -scheme SendToClaw -configuration Debug build 2>&1 | grep -E \"\\(error:|BUILD\\)\" | tail -10)",
+      "Bash(xcodebuild -project SendToClaw.xcodeproj -scheme SendToClaw -configuration Debug build 2>&1 | grep -E \"\\(error:|BUILD\\)\" | tail -5)"
+    ]
+  }
+}

@@ -6,8 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		AA000001AAAA000100000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 23746D502F618BB100A149FE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 23746D572F618BB100A149FE;
+			remoteInfo = SendToClaw;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		23746D582F618BB100A149FE /* SendToClaw.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SendToClaw.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000002AAAA000200000001 /* SendToClawTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SendToClawTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +27,22 @@
 			path = SendToClaw;
 			sourceTree = "<group>";
 		};
+		AA000003AAAA000300000001 /* SendToClawTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = SendToClawTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		23746D552F618BB100A149FE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA000004AAAA000400000001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,6 +56,7 @@
 			isa = PBXGroup;
 			children = (
 				23746D5A2F618BB100A149FE /* SendToClaw */,
+				AA000003AAAA000300000001 /* SendToClawTests */,
 				23746D592F618BB100A149FE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +65,7 @@
 			isa = PBXGroup;
 			children = (
 				23746D582F618BB100A149FE /* SendToClaw.app */,
+				AA000002AAAA000200000001 /* SendToClawTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,6 +95,27 @@
 			productReference = 23746D582F618BB100A149FE /* SendToClaw.app */;
 			productType = "com.apple.product-type.application";
 		};
+		AA000005AAAA000500000001 /* SendToClawTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA000010AAAA001000000001 /* Build configuration list for PBXNativeTarget "SendToClawTests" */;
+			buildPhases = (
+				AA000006AAAA000600000001 /* Sources */,
+				AA000004AAAA000400000001 /* Frameworks */,
+				AA000007AAAA000700000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AA000008AAAA000800000001 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				AA000003AAAA000300000001 /* SendToClawTests */,
+			);
+			name = SendToClawTests;
+			productName = SendToClawTests;
+			productReference = AA000002AAAA000200000001 /* SendToClawTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -82,6 +128,10 @@
 				TargetAttributes = {
 					23746D572F618BB100A149FE = {
 						CreatedOnToolsVersion = 26.3;
+					};
+					AA000005AAAA000500000001 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 23746D572F618BB100A149FE;
 					};
 				};
 			};
@@ -100,12 +150,20 @@
 			projectRoot = "";
 			targets = (
 				23746D572F618BB100A149FE /* SendToClaw */,
+				AA000005AAAA000500000001 /* SendToClawTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		23746D562F618BB100A149FE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA000007AAAA000700000001 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +180,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA000006AAAA000600000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AA000008AAAA000800000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 23746D572F618BB100A149FE /* SendToClaw */;
+			targetProxy = AA000001AAAA000100000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		23746D662F618BB300A149FE /* Debug */ = {
@@ -250,16 +323,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SendToClaw/SendToClaw.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QDJ93ZUQ9B;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "SendToClaw needs microphone access to record your voice for speech-to-text.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "SendToClaw uses speech recognition to convert your voice to text.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -267,7 +343,6 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.yellowplus.SendToClaw;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
@@ -282,16 +357,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SendToClaw/SendToClaw.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = QDJ93ZUQ9B;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "SendToClaw needs microphone access to record your voice for speech-to-text.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "SendToClaw uses speech recognition to convert your voice to text.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -299,13 +377,50 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.yellowplus.SendToClaw;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		AA000011AAAA001100000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QDJ93ZUQ9B;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.yellowplus.SendToClawTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SendToClaw.app/Contents/MacOS/SendToClaw";
+			};
+			name = Debug;
+		};
+		AA000012AAAA001200000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QDJ93ZUQ9B;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.yellowplus.SendToClawTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SendToClaw.app/Contents/MacOS/SendToClaw";
 			};
 			name = Release;
 		};
@@ -326,6 +441,15 @@
 			buildConfigurations = (
 				23746D692F618BB300A149FE /* Debug */,
 				23746D6A2F618BB300A149FE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA000010AAAA001000000001 /* Build configuration list for PBXNativeTarget "SendToClawTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA000011AAAA001100000001 /* Debug */,
+				AA000012AAAA001200000001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
