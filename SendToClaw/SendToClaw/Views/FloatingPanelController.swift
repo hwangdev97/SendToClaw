@@ -5,15 +5,18 @@ import SwiftUI
 class FloatingPanelController {
     private var panel: NSPanel?
 
-    func show(appState: AppState) {
+    func show<Content: View>(content: Content, size: NSSize = NSSize(width: 420, height: 320)) {
         if let existing = panel {
             existing.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
             return
         }
 
+        let hostingView = NSHostingView(rootView: content)
+        hostingView.translatesAutoresizingMaskIntoConstraints = false
+
         let panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 420, height: 320),
+            contentRect: NSRect(origin: .zero, size: size),
             styleMask: [.titled, .closable, .nonactivatingPanel, .hudWindow],
             backing: .buffered,
             defer: false
@@ -23,7 +26,9 @@ class FloatingPanelController {
         panel.title = "SendToClaw"
         panel.titlebarAppearsTransparent = true
         panel.isReleasedWhenClosed = false
-        panel.contentView = NSHostingView(rootView: RecordingPanelView(appState: appState))
+        panel.contentView = hostingView
+        panel.contentMinSize = size
+        panel.contentMaxSize = size
         panel.center()
         panel.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)

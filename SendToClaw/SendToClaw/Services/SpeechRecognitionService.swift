@@ -6,7 +6,36 @@ class SpeechRecognitionService {
     private var audioEngine: AVAudioEngine?
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
-    private let speechRecognizer = SFSpeechRecognizer()
+
+    /// Selected locale for speech recognition. nil = system default (auto-detect).
+    var locale: Locale?
+
+    private var speechRecognizer: SFSpeechRecognizer? {
+        if let locale = locale {
+            return SFSpeechRecognizer(locale: locale)
+        }
+        return SFSpeechRecognizer()
+    }
+
+    /// List supported locales that have on-device or cloud recognition
+    static func supportedLocales() -> [(id: String, name: String)] {
+        let supported = SFSpeechRecognizer.supportedLocales()
+        let displayNames: [(id: String, name: String)] = supported.map { locale in
+            let name = locale.localizedString(forIdentifier: locale.identifier) ?? locale.identifier
+            return (id: locale.identifier, name: "\(name) (\(locale.identifier))")
+        }.sorted { $0.name < $1.name }
+        return displayNames
+    }
+
+    /// Common languages shown at the top of the menu
+    static let commonLocales: [(id: String, name: String)] = [
+        ("", "Auto (System Default)"),
+        ("zh-CN", "中文（简体）"),
+        ("zh-TW", "中文（繁體）"),
+        ("en-US", "English (US)"),
+        ("ja-JP", "日本語"),
+        ("ko-KR", "한국어"),
+    ]
 
     /// Current audio level (0.0 to 1.0) for UI visualization
     var onAudioLevel: ((Float) -> Void)?

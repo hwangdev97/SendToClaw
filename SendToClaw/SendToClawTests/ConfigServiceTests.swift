@@ -30,6 +30,7 @@ struct ConfigServiceTests {
         #expect(config.token == "test-token-12345")
         #expect(config.port == 19000)
         #expect(config.host == "127.0.0.1")
+        #expect(config.name == "Local")
     }
 
     @Test("Uses default port when not specified")
@@ -89,5 +90,39 @@ struct ConfigServiceTests {
         #expect(throws: ConfigError.self) {
             try service.loadConfigFrom(url: configFile)
         }
+    }
+
+    @Test("Channel round-trips through Codable")
+    func configCodable() throws {
+        let original = Channel(
+            id: UUID(),
+            type: .web,
+            name: "Office LAN",
+            host: "192.168.1.50",
+            port: 19000,
+            token: "secret-token"
+        )
+
+        let data = try JSONEncoder().encode([original])
+        let decoded = try JSONDecoder().decode([Channel].self, from: data)
+
+        #expect(decoded.count == 1)
+        #expect(decoded[0].id == original.id)
+        #expect(decoded[0].name == "Office LAN")
+        #expect(decoded[0].host == "192.168.1.50")
+        #expect(decoded[0].port == 19000)
+        #expect(decoded[0].token == "secret-token")
+    }
+
+    @Test("Channel displayName for local vs remote")
+    func configDisplayName() {
+        let local = Channel(id: UUID(), type: .web, name: "Home", host: "127.0.0.1", port: 18789, token: "t")
+        #expect(local.displayName == "Home (local:18789)")
+
+        let localhost = Channel(id: UUID(), type: .web, name: "Dev", host: "localhost", port: 18789, token: "t")
+        #expect(localhost.displayName == "Dev (local:18789)")
+
+        let remote = Channel(id: UUID(), type: .web, name: "Cloud", host: "claw.example.com", port: 443, token: "t")
+        #expect(remote.displayName == "Cloud (claw.example.com:443)")
     }
 }

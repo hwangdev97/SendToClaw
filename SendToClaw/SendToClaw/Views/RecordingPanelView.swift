@@ -50,7 +50,7 @@ struct RecordingPanelView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
             }
-            .frame(minHeight: 120, maxHeight: 200)
+            .frame(height: 160)
 
             // Buttons
             HStack {
@@ -109,7 +109,7 @@ struct RecordingPanelView: View {
     private var displayText: String {
         switch appState.recordingState {
         case .recording:
-            return appState.liveTranscription.isEmpty ? "Listening..." : appState.liveTranscription
+            return appState.liveTranscription.isEmpty ? "Listening... (release to send)" : appState.liveTranscription
         case .sent:
             return "Message sent successfully."
         case .sending:

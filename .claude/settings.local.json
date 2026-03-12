@@ -23,7 +23,16 @@
       "Bash(xcodebuild test:*)",
       "Bash(xcodebuild -project SendToClaw.xcodeproj -scheme SendToClaw -configuration Debug build 2>&1 | grep -E \"\\(error:|warning:|BUILD\\)\" | tail -20)",
       "Bash(xcodebuild -project SendToClaw.xcodeproj -scheme SendToClaw -configuration Debug build 2>&1 | grep -E \"\\(error:|BUILD\\)\" | tail -10)",
-      "Bash(xcodebuild -project SendToClaw.xcodeproj -scheme SendToClaw -configuration Debug build 2>&1 | grep -E \"\\(error:|BUILD\\)\" | tail -5)"
+      "Bash(xcodebuild -project SendToClaw.xcodeproj -scheme SendToClaw -configuration Debug build 2>&1 | grep -E \"\\(error:|BUILD\\)\" | tail -5)",
+      "WebSearch",
+      "Bash(find /Users/hwang/Develop/macOS/SendToClaw -name \"*.plist\" -o -name \"*.json\" -o -name \".openclaw*\" 2>/dev/null | head -10)",
+      "Bash(cd /Users/hwang/Develop/macOS/SendToClaw/SendToClaw && xcodebuild -scheme SendToClaw -configuration Debug build 2>&1 | tail -40)",
+      "Bash(xcodebuild build:*)",
+      "Bash(cd /Users/hwang/Develop/macOS/SendToClaw/SendToClaw && xcodebuild -scheme SendToClaw -destination 'platform=macOS' build 2>&1 | tail -20)",
+      "Bash(xcodebuild -scheme SendToClaw -destination 'platform=macOS' test 2>&1 | tail -20)",
+      "Bash(xcodebuild -scheme SendToClaw -configuration Debug build 2>&1 | grep -E \"error:|BUILD\")",
+      "Bash(cd /Users/hwang/Develop/macOS/SendToClaw/SendToClaw && xcodebuild -scheme SendToClaw -configuration Debug build 2>&1 | grep -E \"error:|BUILD\")",
+      "Bash(find /Users/hwang/Develop/macOS/SendToClaw -type f \\\\\\( -name \"README*\" -o -name \"*.md\" -o -name \".github\" -o -name \"*.yml\" \\\\\\) 2>/dev/null | head -20)"
     ]
   }
 }

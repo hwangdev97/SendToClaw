@@ -5,8 +5,11 @@ class OpenClawService {
     private var messageId = 0
     private var isConnectedInternal = false
 
-    func connect(config: OpenClawConfig) async throws {
-        guard let url = URL(string: "ws://\(config.host):\(config.port)") else {
+    func connect(channel: Channel) async throws {
+        guard let host = channel.host, let port = channel.port, let token = channel.token else {
+            throw OpenClawError.invalidURL
+        }
+        guard let url = URL(string: "ws://\(host):\(port)") else {
             throw OpenClawError.invalidURL
         }
 
@@ -17,7 +20,7 @@ class OpenClawService {
         // Send connect handshake
         let connectParams = ConnectParams(
             client: ClientInfo(),
-            auth: AuthInfo(token: config.token)
+            auth: AuthInfo(token: token)
         )
         let connectReq = RPCRequest(
             id: nextId(),
