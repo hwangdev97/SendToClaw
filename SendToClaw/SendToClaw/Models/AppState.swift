@@ -38,6 +38,10 @@ class AppState: ObservableObject {
     @Published var updateAvailable: (version: String, url: URL, notes: String?)?
     @Published var updateCheckMessage: String?
 
+    // Shortcuts
+    @Published var recordShortcut: ShortcutConfig = .defaultRecord
+    @Published var textInputShortcut: ShortcutConfig = .defaultTextInput
+
     // Connection
     @Published var isConnected = false
 
@@ -55,6 +59,7 @@ class AppState: ObservableObject {
     let panelController = FloatingPanelController()
     let textPanelController = FloatingPanelController()
     let channelEditController = ChannelEditWindowController()
+    let shortcutSettingsController = ShortcutSettingsWindowController()
 
     var activeChannel: Channel? {
         channels.first { $0.id == activeChannelId }
@@ -69,30 +74,11 @@ class AppState: ObservableObject {
             configService.saveActiveChannelId(first.id)
         }
 
-        hotkeyService.register(hotkeys: [
-            // Cmd+Shift+C: Voice recording
-            HotkeyService.HotkeyConfig(
-                id: 1,
-                keyCode: UInt32(kVK_ANSI_C),
-                modifiers: UInt32(cmdKey | shiftKey),
-                onKeyDown: { [weak self] in
-                    Task { @MainActor in self?.showPanelAndRecord() }
-                },
-                onKeyUp: { [weak self] in
-                    Task { @MainActor in self?.stopAndSend() }
-                }
-            ),
-            // Cmd+Shift+T: Text input
-            HotkeyService.HotkeyConfig(
-                id: 2,
-                keyCode: UInt32(kVK_ANSI_T),
-                modifiers: UInt32(cmdKey | shiftKey),
-                onKeyDown: { [weak self] in
-                    Task { @MainActor in self?.toggleTextInputPanel() }
-                },
-                onKeyUp: nil
-            ),
-        ])
+        let shortcuts = configService.loadShortcuts()
+        recordShortcut = shortcuts.record
+        textInputShortcut = shortcuts.textInput
+
+        registerHotkeys()
 
         Task {
             await connectToActiveChannel()
@@ -233,7 +219,11 @@ class AppState: ObservableObject {
 
     func showPanelAndRecord() {
         isPanelVisible = true
-        panelController.show(content: RecordingPanelView(appState: self))
+        panelController.show(
+            content: RecordingPanelView(appState: self),
+            size: NSSize(width: 600, height: 60),
+            borderless: true
+        )
         startRecording()
     }
 
@@ -344,7 +334,8 @@ class AppState: ObservableObject {
         isTextPanelVisible = true
         textPanelController.show(
             content: TextInputPanelView(appState: self),
-            size: NSSize(width: 420, height: 220)
+            size: NSSize(width: 600, height: 60),
+            borderless: true
         )
     }
 
@@ -381,5 +372,40 @@ class AppState: ObservableObject {
         Task {
             await connectToActiveChannel()
         }
+    }
+
+    // MARK: - Hotkey registration
+
+    func registerHotkeys() {
+        hotkeyService.unregisterAll()
+        hotkeyService.register(hotkeys: [
+            HotkeyService.HotkeyConfig(
+                id: 1,
+                keyCode: recordShortcut.keyCode,
+                modifiers: recordShortcut.modifiers,
+                onKeyDown: { [weak self] in
+                    Task { @MainActor in self?.showPanelAndRecord() }
+                },
+                onKeyUp: { [weak self] in
+                    Task { @MainActor in self?.stopAndSend() }
+                }
+            ),
+            HotkeyService.HotkeyConfig(
+                id: 2,
+                keyCode: textInputShortcut.keyCode,
+                modifiers: textInputShortcut.modifiers,
+                onKeyDown: { [weak self] in
+                    Task { @MainActor in self?.toggleTextInputPanel() }
+                },
+                onKeyUp: nil
+            ),
+        ])
+    }
+
+    func updateShortcuts(record: ShortcutConfig, textInput: ShortcutConfig) {
+        recordShortcut = record
+        textInputShortcut = textInput
+        configService.saveShortcuts(record: record, textInput: textInput)
+        registerHotkeys()
     }
 }

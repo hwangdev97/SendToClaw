@@ -5,131 +5,152 @@ struct RecordingPanelView: View {
     @ObservedObject var appState: AppState
 
     var body: some View {
-        VStack(spacing: 16) {
-            // Status bar
-            HStack {
-                Circle()
-                    .fill(statusColor)
-                    .frame(width: 10, height: 10)
-                Text(statusText)
-                    .font(.headline)
-                Spacer()
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(appState.isConnected ? .green : .red)
-                        .frame(width: 8, height: 8)
-                    Text(appState.isConnected ? "Connected" : "Disconnected")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
+        VStack(spacing: 8) {
+            // Main bar
+            HStack(spacing: 12) {
+                Image("Background")
+                    .resizable()
+                    .frame(width: 36, height: 36)
 
-            // Audio level meter (visible during recording)
-            if appState.recordingState == .recording {
-                AudioLevelView(level: appState.audioLevel)
-                    .frame(height: 30)
-            }
-
-            // Text area
-            Group {
-                if case .reviewing = appState.recordingState {
-                    TextEditor(text: $appState.transcribedText)
-                        .font(.body)
-                        .scrollContentBackground(.hidden)
-                        .padding(8)
-                        .background(.background.opacity(0.5))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                } else {
-                    ScrollView {
+                // Center area: waveform when recording, text otherwise
+                Group {
+                    if appState.recordingState == .recording {
+                        WaveformView(level: appState.audioLevel)
+                    } else {
                         Text(displayText)
-                            .font(.body)
-                            .frame(maxWidth: .infinity, alignment: .topLeading)
-                            .padding(8)
+                            .font(.system(size: 14))
+                            .foregroundStyle(textColor)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .background(.background.opacity(0.5))
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
+                .frame(maxWidth: .infinity)
+                .frame(height: 28)
+
+                statusBadge
             }
-            .frame(height: 160)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 8)
+            .frame(width: 600)
+            .glassEffect()
+            .clipShape(RoundedRectangle(cornerRadius: 48))
 
-            // Buttons
-            HStack {
-                Button("Cancel") {
-                    appState.cancel()
-                }
-                .keyboardShortcut(.escape, modifiers: [])
-
-                Spacer()
-
-                if appState.recordingState == .recording {
-                    Button("Stop") {
-                        appState.stopRecording()
-                    }
-                    .keyboardShortcut(.space, modifiers: [])
-                } else if appState.recordingState == .idle {
-                    Button("Record") {
-                        appState.startRecording()
-                    }
-                }
-
-                Button("Send") {
-                    appState.send()
-                }
-                .keyboardShortcut(.return, modifiers: .command)
-                .disabled(!canSend)
-                .buttonStyle(.borderedProminent)
+            // Live transcription below the bar
+            if !appState.liveTranscription.isEmpty {
+                Text(appState.liveTranscription)
+                    .font(.system(size: 13))
+                    .foregroundStyle(.primary)
+                    .shadow(color: .black, radius: 3, x: 0, y: 1)
+                    .lineLimit(2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
             }
         }
-        .padding(20)
-        .frame(width: 420)
+        .frame(width: 600)
     }
 
-    private var statusColor: Color {
+    @ViewBuilder
+    private var statusBadge: some View {
         switch appState.recordingState {
-        case .recording: return .red
-        case .reviewing: return .orange
-        case .sending: return .blue
-        case .sent: return .green
-        case .error: return .red
-        case .idle: return .gray
-        }
-    }
-
-    private var statusText: String {
-        switch appState.recordingState {
-        case .recording: return "Recording..."
-        case .reviewing: return "Review & Edit"
-        case .sending: return "Sending..."
-        case .sent: return "Sent!"
-        case .error(let msg): return "Error: \(msg)"
-        case .idle: return "Ready"
+        case .recording:
+            HStack(spacing: 4) {
+                Circle()
+                    .fill(.red)
+                    .frame(width: 8, height: 8)
+                Text("Recording")
+                    .font(.caption)
+            }
+            .foregroundStyle(.red)
+        case .sending:
+            HStack(spacing: 4) {
+                ProgressView()
+                    .controlSize(.small)
+                Text("Sending")
+                    .font(.caption)
+            }
+            .foregroundStyle(.secondary)
+        case .sent:
+            HStack(spacing: 4) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.caption)
+                Text("Sent")
+                    .font(.caption)
+            }
+            .foregroundStyle(.green)
+        case .error(let msg):
+            HStack(spacing: 4) {
+                Image(systemName: "exclamationmark.circle.fill")
+                    .font(.caption)
+                Text(msg)
+                    .font(.caption)
+                    .lineLimit(1)
+            }
+            .foregroundStyle(.red)
+        default:
+            EmptyView()
         }
     }
 
     private var displayText: String {
         switch appState.recordingState {
-        case .recording:
-            return appState.liveTranscription.isEmpty ? "Listening... (release to send)" : appState.liveTranscription
-        case .sent:
-            return "Message sent successfully."
+        case .reviewing:
+            return appState.transcribedText.isEmpty ? "No transcription" : appState.transcribedText
         case .sending:
             return appState.transcribedText
-        default:
-            return appState.transcribedText.isEmpty ? appState.liveTranscription : appState.transcribedText
+        case .sent:
+            return "Message sent"
+        case .error:
+            return appState.transcribedText
+        case .idle:
+            return "Ready"
+        case .recording:
+            return ""
         }
     }
 
-    private var canSend: Bool {
+    private var textColor: Color {
         switch appState.recordingState {
-        case .reviewing:
-            return !appState.transcribedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        default:
-            return false
+        case .sent: return .green
+        case .error: return .red
+        case .idle: return .secondary
+        default: return .primary
         }
     }
 }
 
-/// Simple audio level visualization with animated bars
+/// Animated waveform visualization for recording state
+struct WaveformView: View {
+    let level: Float
+    private let barCount = 40
+
+    var body: some View {
+        HStack(spacing: 1.5) {
+            ForEach(0..<barCount, id: \.self) { index in
+                let normalizedIndex = Float(index) / Float(barCount)
+                // Create a wave shape centered at the current level
+                let distance = abs(normalizedIndex - 0.5) * 2.0
+                let height = max(0.08, (1.0 - distance) * level)
+                RoundedRectangle(cornerRadius: 1)
+                    .fill(barColor(for: height))
+                    .frame(height: CGFloat(height) * 28)
+            }
+        }
+        .animation(.easeOut(duration: 0.08), value: level)
+    }
+
+    private func barColor(for height: Float) -> Color {
+        if height > 0.7 {
+            return .red
+        } else if height > 0.4 {
+            return .orange
+        } else {
+            return .green
+        }
+    }
+}
+
+/// Legacy bar-style audio level view (kept for compatibility)
 struct AudioLevelView: View {
     let level: Float
     private let barCount = 20

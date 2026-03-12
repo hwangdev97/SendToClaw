@@ -11,15 +11,21 @@ struct MenuBarView: View {
             Button {
                 appState.togglePanel()
             } label: {
-                Label("Record & Send (Cmd+Shift+C)", systemImage: "waveform")
+                Label("Record & Send (\(appState.recordShortcut.symbolString))", systemImage: "waveform")
             }
 
             Button {
                 appState.toggleTextInputPanel()
             } label: {
-                Label("Text Input (Cmd+Shift+T)", systemImage: "text.cursor")
+                Label("Text Input (\(appState.textInputShortcut.symbolString))", systemImage: "text.cursor")
             }
-            
+
+            Button {
+                appState.shortcutSettingsController.show(appState: appState)
+            } label: {
+                Label("Customize Shortcuts...", systemImage: "keyboard")
+            }
+
             Divider()
 
             // Channel selection

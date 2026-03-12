@@ -171,3 +171,58 @@ class ChannelEditWindowController {
         window = nil
     }
 }
+
+#if DEBUG
+
+#Preview("Add Web Channel") {
+    ChannelEditView(
+        appState: AppState(),
+        channelType: .web,
+        editingChannel: nil,
+        onDismiss: {}
+    )
+}
+
+#Preview("Add Telegram Channel") {
+    ChannelEditView(
+        appState: AppState(),
+        channelType: .telegram,
+        editingChannel: nil,
+        onDismiss: {}
+    )
+}
+
+#Preview("Edit Web Channel") {
+    let editing = Channel(
+        id: UUID(),
+        type: .web,
+        name: "Office",
+        host: "claw.example.com",
+        port: 18789,
+        token: "abc123"
+    )
+    return ChannelEditView(
+        appState: AppState(),
+        channelType: .web,
+        editingChannel: editing,
+        onDismiss: {}
+    )
+}
+
+#Preview("Edit Telegram Channel") {
+    let editing = Channel(
+        id: UUID(),
+        type: .telegram,
+        name: "My Telegram",
+        botUsername: "my_openclaw_bot"
+    )
+    return ChannelEditView(
+        appState: AppState(),
+        channelType: .telegram,
+        editingChannel: editing,
+        onDismiss: {}
+    )
+}
+
+#endif
+

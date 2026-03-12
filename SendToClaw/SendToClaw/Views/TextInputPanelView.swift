@@ -4,139 +4,181 @@ struct TextInputPanelView: View {
     @ObservedObject var appState: AppState
 
     var body: some View {
-        VStack(spacing: 12) {
-            // Status bar
-            HStack {
-                Circle()
-                    .fill(statusColor)
-                    .frame(width: 10, height: 10)
-                Text(statusText)
-                    .font(.headline)
-                Spacer()
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(appState.isConnected ? .green : .red)
-                        .frame(width: 8, height: 8)
-                    Text(appState.connectedChannelName.isEmpty ? "Disconnected" : appState.connectedChannelName)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
+        VStack(spacing: 0) {
+            // Main input row
+            HStack(spacing: 12) {
+                // Status indicator
+                Image("Background")
+                    .resizable()
+                    .frame(width: 36,height: 36 )
 
-            // Text input area
-            TextInputEditor(text: $appState.textInputContent, onSubmit: {
-                appState.sendTextInput()
-            })
-            .font(.body)
-            .scrollContentBackground(.hidden)
-            .padding(8)
-            .background(.background.opacity(0.5))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .frame(height: 100)
-
-            // Hint + buttons
-            HStack {
-                Text("Return to send, Shift+Return for newline")
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
-
-                Spacer()
-
-                Button("Cancel") {
+                // Text input
+                TextInputEditor(text: $appState.textInputContent, onSubmit: {
+                    appState.sendTextInput()
+                }, onCancel: {
                     appState.cancelTextInput()
+                })
+
+                // Channel picker
+                Menu {
+                    ForEach(appState.channels) { channel in
+                        Button {
+                            appState.switchChannel(to: channel.id)
+                        } label: {
+                            HStack {
+                                if channel.id == appState.activeChannelId {
+                                    Image(systemName: "checkmark")
+                                }
+                                Text(channel.name)
+                            }
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Circle()
+                            .fill(appState.isConnected ? .green : .red)
+                            .frame(width: 6, height: 6)
+                        Text(appState.connectedChannelName.isEmpty ? "No Channel" : appState.connectedChannelName)
+                            .font(.body)
+                            .lineLimit(1)
+                    }
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 4)
+                    .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 6))
                 }
-                .keyboardShortcut(.escape, modifiers: [])
+                .menuStyle(.borderlessButton)
+                .fixedSize()
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 8)
+
+            // Bottom hint bar
+            if appState.textInputState == .error("") || statusHint != nil {
+                Divider().opacity(0.3)
+                HStack {
+                    if let hint = statusHint {
+                        Text(hint)
+                            .font(.caption2)
+                            .foregroundStyle(appState.textInputState.isError ? Color.red : Color.secondary)
+                    }
+                    Spacer()
+                    Text("⏎ Send  ⇧⏎ Newline  ⎋ Cancel")
+                        .font(.caption2)
+                        .foregroundStyle(.quaternary)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 6)
             }
         }
-        .padding(20)
-        .frame(width: 420)
+        .frame(width: 600)
+        .glassEffect()
+        .clipShape(RoundedRectangle(cornerRadius: 48))
+        
+    }
+
+    private var statusIcon: String {
+        switch appState.textInputState {
+        case .editing: return "text.cursor"
+        case .sending: return "arrow.up.circle.fill"
+        case .sent: return "checkmark.circle.fill"
+        case .error: return "exclamationmark.circle.fill"
+        case .idle: return "text.cursor"
+        }
     }
 
     private var statusColor: Color {
         switch appState.textInputState {
-        case .editing: return .blue
+        case .editing: return .secondary
         case .sending: return .orange
         case .sent: return .green
         case .error: return .red
-        case .idle: return .gray
+        case .idle: return .secondary
         }
     }
 
-    private var statusText: String {
+    private var statusHint: String? {
         switch appState.textInputState {
-        case .editing: return "Type your message"
         case .sending: return "Sending..."
         case .sent: return "Sent!"
-        case .error(let msg): return "Error: \(msg)"
-        case .idle: return "Ready"
+        case .error(let msg): return msg
+        default: return nil
         }
     }
 }
 
-/// A TextEditor that intercepts Return to submit, Shift+Return for newline
+private extension TextInputState {
+    var isError: Bool {
+        if case .error = self { return true }
+        return false
+    }
+}
+
+/// Single-line text field that submits on Return and cancels on Escape
 struct TextInputEditor: NSViewRepresentable {
     @Binding var text: String
     var onSubmit: () -> Void
+    var onCancel: () -> Void
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(text: $text, onSubmit: onSubmit)
+        Coordinator(text: $text, onSubmit: onSubmit, onCancel: onCancel)
     }
 
-    func makeNSView(context: Context) -> NSScrollView {
-        let scrollView = NSTextView.scrollableTextView()
-        let textView = scrollView.documentView as! NSTextView
-        textView.delegate = context.coordinator
-        textView.font = .systemFont(ofSize: NSFont.systemFontSize)
-        textView.isRichText = false
-        textView.isAutomaticQuoteSubstitutionEnabled = false
-        textView.isAutomaticDashSubstitutionEnabled = false
-        textView.backgroundColor = .clear
-        textView.textColor = .labelColor
-        textView.insertionPointColor = .labelColor
+    func makeNSView(context: Context) -> NSTextField {
+        let field = NSTextField()
+        field.delegate = context.coordinator
+        field.font = .systemFont(ofSize: 16)
+        field.isBordered = false
+        field.isBezeled = false
+        field.drawsBackground = false
+        field.focusRingType = .none
+        field.textColor = .labelColor
+        field.placeholderString = "Type a message..."
+        field.cell?.usesSingleLineMode = true
+        field.cell?.wraps = false
+        field.cell?.isScrollable = true
 
-        // Focus the text view
         DispatchQueue.main.async {
-            textView.window?.makeFirstResponder(textView)
+            field.window?.makeFirstResponder(field)
         }
 
-        return scrollView
+        return field
     }
 
-    func updateNSView(_ nsView: NSScrollView, context: Context) {
-        let textView = nsView.documentView as! NSTextView
-        if textView.string != text {
-            textView.string = text
+    func updateNSView(_ nsView: NSTextField, context: Context) {
+        if nsView.stringValue != text {
+            nsView.stringValue = text
         }
         context.coordinator.text = $text
         context.coordinator.onSubmit = onSubmit
+        context.coordinator.onCancel = onCancel
     }
 
-    class Coordinator: NSObject, NSTextViewDelegate {
+    class Coordinator: NSObject, NSTextFieldDelegate {
         var text: Binding<String>
         var onSubmit: () -> Void
+        var onCancel: () -> Void
 
-        init(text: Binding<String>, onSubmit: @escaping () -> Void) {
+        init(text: Binding<String>, onSubmit: @escaping () -> Void, onCancel: @escaping () -> Void) {
             self.text = text
             self.onSubmit = onSubmit
+            self.onCancel = onCancel
         }
 
-        func textDidChange(_ notification: Notification) {
-            guard let textView = notification.object as? NSTextView else { return }
-            text.wrappedValue = textView.string
+        func controlTextDidChange(_ obj: Notification) {
+            guard let field = obj.object as? NSTextField else { return }
+            text.wrappedValue = field.stringValue
         }
 
-        func textView(_ textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
             if commandSelector == #selector(NSResponder.insertNewline(_:)) {
-                // Return pressed without Shift → submit
-                if NSEvent.modifierFlags.contains(.shift) {
-                    // Shift+Return → insert newline
-                    textView.insertNewlineIgnoringFieldEditor(nil)
-                    return true
-                }
-                let trimmed = textView.string.trimmingCharacters(in: .whitespacesAndNewlines)
+                let trimmed = (control as? NSTextField)?.stringValue.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
                 if !trimmed.isEmpty {
                     onSubmit()
                 }
+                return true
+            }
+            if commandSelector == #selector(NSResponder.cancelOperation(_:)) {
+                onCancel()
                 return true
             }
             return false

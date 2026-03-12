@@ -12,6 +12,7 @@ private struct LegacyOpenClawConfig: Codable, Identifiable {
 class ConfigService {
     private static let channelsKey = "channels"
     private static let activeChannelKey = "active_channel_id"
+    private static let shortcutsKey = "shortcuts"
     private static let legacyServersKey = "openclaw_servers"
     private static let legacyActiveServerKey = "openclaw_active_server_id"
 
@@ -102,6 +103,28 @@ class ConfigService {
 
     func saveActiveChannelId(_ id: UUID?) {
         UserDefaults.standard.set(id?.uuidString, forKey: Self.activeChannelKey)
+    }
+
+    // MARK: - Shortcuts
+
+    struct SavedShortcuts: Codable {
+        var record: ShortcutConfig
+        var textInput: ShortcutConfig
+    }
+
+    func loadShortcuts() -> (record: ShortcutConfig, textInput: ShortcutConfig) {
+        if let data = UserDefaults.standard.data(forKey: Self.shortcutsKey),
+           let saved = try? JSONDecoder().decode(SavedShortcuts.self, from: data) {
+            return (saved.record, saved.textInput)
+        }
+        return (.defaultRecord, .defaultTextInput)
+    }
+
+    func saveShortcuts(record: ShortcutConfig, textInput: ShortcutConfig) {
+        let saved = SavedShortcuts(record: record, textInput: textInput)
+        if let data = try? JSONEncoder().encode(saved) {
+            UserDefaults.standard.set(data, forKey: Self.shortcutsKey)
+        }
     }
 }
 

@@ -95,9 +95,20 @@ class HotkeyService {
         ])
     }
 
-    deinit {
+    func unregisterAll() {
         for ref in hotKeyRefs {
             UnregisterEventHotKey(ref)
         }
+        hotKeyRefs.removeAll()
+        keyDownHandlers.removeAll()
+        keyUpHandlers.removeAll()
+        if let handler = eventHandlerRef {
+            RemoveEventHandler(handler)
+            eventHandlerRef = nil
+        }
+    }
+
+    deinit {
+        unregisterAll()
     }
 }
