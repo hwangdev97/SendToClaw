@@ -34,6 +34,10 @@ class AppState: ObservableObject {
     @Published var textInputContent = ""
     @Published var isTextPanelVisible = false
 
+    // Update
+    @Published var updateAvailable: (version: String, url: URL, notes: String?)?
+    @Published var updateCheckMessage: String?
+
     // Connection
     @Published var isConnected = false
 
@@ -42,6 +46,7 @@ class AppState: ObservableObject {
     @Published var activeChannelId: UUID?
     @Published var connectedChannelName: String = ""
 
+    let updateService = UpdateService()
     let speechService = SpeechRecognitionService()
     let openClawService = OpenClawService()
     let telegramService = TelegramService()
@@ -91,6 +96,39 @@ class AppState: ObservableObject {
 
         Task {
             await connectToActiveChannel()
+        }
+
+        Task {
+            await checkForUpdates(manual: false)
+        }
+    }
+
+    // MARK: - Update check
+
+    func checkForUpdates(manual: Bool) async {
+        if !manual {
+            guard updateService.shouldAutoCheck() else { return }
+        }
+
+        let result = await updateService.checkForUpdate()
+        updateService.recordCheckTime()
+
+        switch result {
+        case .upToDate:
+            if manual {
+                updateCheckMessage = "已是最新版本 ✓"
+                try? await Task.sleep(for: .seconds(3))
+                updateCheckMessage = nil
+            }
+        case .updateAvailable(let version, let url, let notes):
+            if !manual && updateService.isVersionSkipped(version) { return }
+            updateAvailable = (version: version, url: url, notes: notes)
+        case .error(let msg):
+            if manual {
+                updateCheckMessage = "检查失败: \(msg)"
+                try? await Task.sleep(for: .seconds(3))
+                updateCheckMessage = nil
+            }
         }
     }
 

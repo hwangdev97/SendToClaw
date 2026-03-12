@@ -8,14 +8,18 @@ struct MenuBarView: View {
 
     var body: some View {
         VStack {
-            Button("Record & Send (Cmd+Shift+C)") {
+            Button {
                 appState.togglePanel()
+            } label: {
+                Label("Record & Send (Cmd+Shift+C)", systemImage: "waveform")
             }
 
-            Button("Text Input (Cmd+Shift+T)") {
+            Button {
                 appState.toggleTextInputPanel()
+            } label: {
+                Label("Text Input (Cmd+Shift+T)", systemImage: "text.cursor")
             }
-
+            
             Divider()
 
             // Channel selection
@@ -24,7 +28,7 @@ struct MenuBarView: View {
             Divider()
 
             // Language selection
-            Menu("Language: \(selectedLanguageName)") {
+            Menu {
                 ForEach(SpeechRecognitionService.commonLocales, id: \.id) { locale in
                     Button {
                         appState.selectedLocaleId = locale.id
@@ -37,10 +41,12 @@ struct MenuBarView: View {
                         }
                     }
                 }
+            } label: {
+                Label("Language: \(selectedLanguageName)", systemImage: "globe")
             }
 
             // Microphone selection
-            Menu("Mic: \(currentDeviceName)") {
+            Menu {
                 ForEach(inputDevices, id: \.id) { device in
                     Button {
                         SpeechRecognitionService.setInputDevice(id: device.id)
@@ -54,12 +60,43 @@ struct MenuBarView: View {
                         }
                     }
                 }
+            } label: {
+                Label("Mic: \(currentDeviceName)", systemImage: "mic")
             }
 
             Divider()
 
-            Button("Quit") {
+            if let update = appState.updateAvailable {
+                Button {
+                    NSWorkspace.shared.open(update.url)
+                } label: {
+                    Label("New Version: v\(update.version)", systemImage: "sparkles")
+                }
+                Button {
+                    appState.updateService.skipVersion(update.version)
+                    appState.updateAvailable = nil
+                } label: {
+                    Label("Skip This Version", systemImage: "xmark.circle")
+                }
+            }
+
+            if let msg = appState.updateCheckMessage {
+                Text(msg)
+                    .foregroundStyle(.secondary)
+            }
+
+            Button {
+                Task { await appState.checkForUpdates(manual: true) }
+            } label: {
+                Label("Check for Updates...", systemImage: "arrow.triangle.2.circlepath")
+            }
+
+            Divider()
+
+            Button {
                 NSApplication.shared.terminate(nil)
+            } label: {
+                Label("Quit", systemImage: "power")
             }
             .keyboardShortcut("q")
         }
@@ -89,47 +126,56 @@ struct MenuBarView: View {
         // Channel list
         ForEach(appState.channels) { channel in
             Menu {
-                Button("Connect") {
+                Button {
                     appState.switchChannel(to: channel.id)
+                } label: {
+                    Label("Connect", systemImage: "link")
                 }
-                Button("Edit...") {
+                Button {
                     appState.channelEditController.show(appState: appState, editingChannel: channel)
+                } label: {
+                    Label("Edit...", systemImage: "pencil")
                 }
                 Divider()
-                Button("Delete", role: .destructive) {
+                Button(role: .destructive) {
                     appState.removeChannel(id: channel.id)
+                } label: {
+                    Label("Delete", systemImage: "trash")
                 }
             } label: {
                 HStack {
                     if channel.id == appState.activeChannelId {
-                        Image(systemName: appState.isConnected ? "checkmark.circle.fill" : "checkmark.circle")
+                        Image(systemName: appState.isConnected ? "checkmark" : "circle")
                     } else {
-                        Image(systemName: "circle")
+                        Image(systemName: "")
                     }
-                    Image(systemName: channel.type == .web ? "globe" : "paperplane")
-                        .foregroundStyle(.secondary)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(channel.name)
-                        Text(channelSubtitle(channel))
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
+                    
+                    Text(channel.name)
+                    
                 }
             }
         }
 
-        Menu("Add Channel") {
-            Button("Web Server...") {
+        Menu {
+            Button {
                 appState.channelEditController.show(appState: appState, channelType: .web)
+            } label: {
+                Label("Web Server...", systemImage: "globe")
             }
-            Button("Telegram...") {
+            Button {
                 appState.channelEditController.show(appState: appState, channelType: .telegram)
+            } label: {
+                Label("Telegram...", systemImage: "paperplane")
             }
+        } label: {
+            Label("Add Channel", systemImage: "plus")
         }
 
         if !appState.isConnected {
-            Button("Reconnect") {
+            Button {
                 appState.reconnect()
+            } label: {
+                Label("Reconnect", systemImage: "arrow.clockwise")
             }
         }
     }

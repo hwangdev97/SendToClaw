@@ -5,7 +5,7 @@ struct SendToClawApp: App {
     @StateObject private var appState = AppState()
 
     var body: some Scene {
-        MenuBarExtra("SendToClaw", systemImage: "mic.circle") {
+        MenuBarExtra("SendToClaw", image: "MenuBarIcon") {
             MenuBarView(appState: appState)
                 .onAppear {
                     appState.setup()
