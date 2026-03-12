@@ -1,16 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "icon_18.png",
+      "filename" : "bg.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "icon_36.png",
+      "filename" : "bg@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "bg@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
@@ -18,9 +19,5 @@
   "info" : {
     "author" : "xcode",
     "version" : 1
-  },
-  "properties" : {
-    "preserves-vector-representation" : true,
-    "template-rendering-intent" : "template"
   }
 }
